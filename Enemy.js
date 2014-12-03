@@ -30,12 +30,18 @@ var Enemy = Class.extend({
         document.addEventListener("draw", this.drawFunc, false);
     },
     destroy: function () {
+        for (var i in enemies) {
+            if (enemies[i].life <= 0)
+                enemies.splice(i, 1);
+        }
+        Enemies.innerText = enemies.length;
+        Score.innerText = Score.innerText * 1 + 10;
         document.removeEventListener("draw", this.drawFunc, false);
         document.removeEventListener("update", this.updateFunc, false);
         delete this;
     },
     respawn: function () {
-        if(!this.spawning) {
+        if (!this.spawning) {
             this.spawning = true;
             this.init(this.size, Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT, this.angle, this.speed);
             this.destroy();
@@ -83,9 +89,9 @@ var Enemy = Class.extend({
         var bullets = player.getBullets();
         for (var i in bullets) {
             if (bullets[i] && Math.abs(this.x - bullets[i].x) <= this.size && Math.abs(this.y - bullets[i].y) <= this.size) {
-                //this.life = -1;
-                //this.destroy();
-                this.respawn();
+                this.life = -1;
+                this.destroy();
+                //this.respawn();
             }
         }
 
