@@ -13,13 +13,13 @@ var Enemy = Class.extend({
     life: 0,
     spawning: false,
     weapon: null,
-    init: function (size, x, y, angle, speed, life) {
-        this.size = size;
-        this.x = x;
-        this.y = y;
-        this.angle = angle || 0;
-        this.speed = speed || 5;
-        this.life = life || 10;
+    init: function (opt) {
+        this.size = opt.size || 20;
+        this.x = opt.x || 0;
+        this.y = opt.y || 0;
+        this.angle = opt.angle || 0;
+        this.speed = opt.speed || 5;
+        this.life = opt.life || 10;
         this.spawning = false;
 
         this.setColor();
@@ -31,7 +31,7 @@ var Enemy = Class.extend({
     },
     destroy: function () {
         for (var i in enemies) {
-            if (enemies[i].life <= 0)
+            if (enemies[i] && enemies[i].life <= 0)
                 enemies.splice(i, 1);
         }
         Enemies.innerText = enemies.length;
@@ -93,6 +93,11 @@ var Enemy = Class.extend({
                 this.destroy();
                 //this.respawn();
             }
+        }
+
+        // if player crashes a enemy GAME OVER
+        if (Math.abs(this.x - player.x) <= this.size && Math.abs(this.y - player.y) <= this.size) {
+            player.destroy();
         }
 
         //if (this.weapon)

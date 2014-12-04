@@ -7,7 +7,8 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            font: 11px/1.2 sans-serif;
+            color: #bbb;
+            font: 14px/1.2 sans-serif;
             overflow: hidden;
         }
 
@@ -17,13 +18,32 @@
             left: 0;
             padding: 5px 8px;
             width: 100%;
-            color: #bbb;
             box-sizing: border-box;
         }
 
         #scoreboard {
             float: right;
             color: #bbb;
+        }
+
+        #play {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;;
+        }
+
+        #playButton {
+            display: inline-block;
+            padding: 8px 31px;
+            border: 0;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 20px;
+            background: rgba(242, 177, 56, .8);
+            cursor: pointer;
         }
 
         canvas {
@@ -41,6 +61,10 @@
         Score:<span id="score">0</span>
     </div>
 </header>
+<div id="play"><p id="info">You are a yellow triangle and have few ammo. Also your enemies are triangle but a little bit
+    smaller than you. You should fire by space key and destroy your enemies.</p>
+    <button id="playButton">Play</button>
+</div>
 <script src="Core.js"></script>
 <script src="Player.js"></script>
 <script src="Weapon.js"></script>

@@ -1,6 +1,7 @@
 // PLAYER
 // =============================================================================
 var Player = Class.extend({
+    _eventListeners: [],
     sensors: [],
     size: 0,
     x: 0,
@@ -11,24 +12,33 @@ var Player = Class.extend({
     sensorMeasuring: 0,
     p_cache: .5,
     weapon: null,
-    init: function (size, x, y, angle, speed) {
-        this.size = size;
-        this.x = x;
-        this.y = y;
-        this.angle = angle || 0;
-        this.speed = speed || 5;
-
-        this.setColor();
-
-        document.addEventListener("update", bind(this, this.update), false);
-        document.addEventListener("draw", bind(this, this.draw), false);
+    init: function (opt) {
+        this.size = opt.size || 20;
+        this.x = opt.x || 0;
+        this.y = opt.y || 0;
+        this.angle = opt.angle || 0;
+        this.speed = opt.speed || 5;
+        this.setColor(opt.color || '242,177,56,.8');
     },
-    setColor: function () {
+    spawn: function () {
+        this.updateFunc = bind(this, this.update);
+        this.drawFunc = bind(this, this.draw);
+        document.addEventListener("update", this.updateFunc, false);
+        document.addEventListener("draw", this.drawFunc, false);
+    },
+    destroy: function () {
+        this.fire('destroy');
+        document.removeEventListener("draw", this.drawFunc, false);
+        document.removeEventListener("update", this.updateFunc, false);
+        delete this;
+    },
+    setColor: function (rgba) {
+        rgba = rgba.replace(/ /, '').split(/,/)
         this.color = {};
-        this.color.r = Math.round(Math.random() * 255);
-        this.color.g = Math.round(Math.random() * 255);
-        this.color.b = Math.round(Math.random() * 255);
-        this.color.opacity = .8;
+        this.color.r = rgba[0] || Math.round(Math.random() * 255);
+        this.color.g = rgba[1] || Math.round(Math.random() * 255);
+        this.color.b = rgba[2] || Math.round(Math.random() * 255);
+        this.color.opacity = rgba[3] || .8;
     },
     setWeapon: function (weapon) {
         this.weapon = weapon;
@@ -107,3 +117,39 @@ var Player = Class.extend({
         return '[' + this.x + ',' + this.y + ']';
     }
 });
+
+Player.prototype.addEventListener = function (type, listener) {
+    if (typeof this._eventListeners[type] == "undefined") {
+        this._eventListeners[type] = [];
+    }
+    this._eventListeners[type].push(listener);
+};
+Player.prototype.fire = function (event) {
+    if (typeof event == "string") {
+        event = {type: event};
+    }
+    if (!event.target) {
+        event.target = this;
+    }
+    if (!event.type) {
+        throw new Error("Event object missing 'type' property.");
+    }
+    if (this._eventListeners[event.type] instanceof Array) {
+        var listeners = this._eventListeners[event.type];
+        for (var i = 0, len = listeners.length; i < len; i++) {
+            listeners[i].call(this, event);
+        }
+    }
+};
+Player.prototype.removeEventListener = function (type, listener) {
+    if (this._eventListeners[type] instanceof Array) {
+        var listeners = this._eventListeners[type];
+        for (var i = 0, len = listeners.length; i < len; i++) {
+            if (listeners[i] === listener) {
+                listeners.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+};
